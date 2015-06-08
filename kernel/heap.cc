@@ -11,6 +11,7 @@ Heap_Base *Heap::heap = 0;
 /* PLACEMENT NEW */
 
 
+//Overrides new operator. 
 void *operator new(size_t size, void *ptr){
 	return ptr; 
 }
@@ -32,6 +33,7 @@ void free(void *ptr){
 
 
 void Heap::init(void *baseAddr, size_t size){
+	//Creates heap object at baseAddr. 
 	heap = new(baseAddr) FF_Heap(baseAddr, size);  
 }
 
@@ -164,7 +166,7 @@ void FF_Heap::splitBlock(void *block, size_t size){
 void *FF_Heap::malloc(size_t size){
 	void *block = firstBlock; 
 
-	//Rounds size up to a multiple of 4.
+	//Rounds size of data up to a multiple of 4 to align memory. 
 	size_t extraBytes = 4 - (size % 4);
 	size_t actualSize = size + extraBytes; 
 

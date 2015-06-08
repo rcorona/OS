@@ -79,6 +79,7 @@ private:
 	static Heap_Base *heap; 
 };
 
+//A first fit heap. 
 class FF_Heap : public Heap_Base{
 public:
 	FF_Heap(void *baseAddr, size_t bytes);  
@@ -115,7 +116,7 @@ private:
 	  then returns a pointer to it. */
 	void *makeBlock(uint8_t *startAddr, size_t size); 
 	
-	//Returns a footer pointer given a block's starting address. 
+	//Returns a footer pointer given a block's starting address (start for data that is). 
 	ftrP getFooter(void *block);
 
 	//Returns a header pointer given a block's starting address. 

@@ -81,7 +81,7 @@ void *FF_Heap::makeBlock(uint8_t *startAddr, size_t size){
 	ftr->free = true; 
 
 	//Performs sanity check on block. 
-	sanity(block); 
+	sanity(block, "makeBlock"); 
 
 	//Returns newly created block. 
 	return block; 
@@ -98,18 +98,20 @@ FF_Heap::ftrP FF_Heap::getFooter(void *block){
 	return (ftrP)(addr + sizeof(hdr_t) + hdr->size); 
 }
 
-void FF_Heap::sanity(void *block){
+uint32_t FF_Heap::sanity(void *block, const char *function){
 	hdrP hdr = getHeader(block);
 	ftrP ftr = getFooter(block); 
 
 	if (hdr->free != ftr->free || hdr->size != ftr->size)
-		PANIC("Header and footer don't match!!!")
+		PANIC("%s: Header and footer don't match!!!", function); 
 
 	//Gets actual size of block and compares it to value in hdr. 
 	uint32_t blockSize = (uint32_t)ftr - ((uint32_t)hdr + sizeof(hdr_t));  
 
 	if (blockSize != hdr->size)
-		PANIC("Actual block size not equal to value in header!!!");
+		PANIC("%s: Size specified not actual block size!!!", function);
+
+	return 0;
 }
 
 bool FF_Heap::isFree(void *block){
@@ -133,6 +135,17 @@ void *FF_Heap::nextBlock(void *block){
 
 	//Returns nextBlock or firstBlock if wrapping is necessary. 
 	return wrap ? firstBlock : nextBlock; 
+}
+
+void *FF_Heap::prevBlock(void *block){
+	if (block == firstBlock)
+		return firstBlock; 
+
+	ftrP prevFtr = (ftrP)((uint8_t *)block - sizeof(hdr_t) - sizeof(ftr_t)); 
+
+	void *prevBlock = (void *)((uint8_t *)prevFtr - prevFtr->size); 
+
+	return prevBlock; 
 }
 
 void FF_Heap::splitBlock(void *block, size_t size){
@@ -186,5 +199,44 @@ void *FF_Heap::malloc(size_t size){
 }
 
 void FF_Heap::free(void *ptr){
-	// TODO
+	//Performs sanity to ensure pointer points to a block. 
+	sanity(ptr, "free"); 
+
+	//Checks if block is already free, raises error if so. 
+	if (!isFree(ptr))
+		PANIC("Attempting to free already free block!!!");
+
+	//sets block as free. 
+	hdrP hdr = getHeader(ptr); 
+	ftrP ftr = getFooter(ptr); 
+
+	hdr->free = ftr->free = true; 
+
+	//check right block to do right coalesce if necessary
+	nextBlck = nextBlock();
+
+	if (nextBlck != firstBlock && isFree(nextBlck))
+		coalesce(ptr, nextBlck); 
+
+	//check left block to do left coalesce if necessary
+	prevBlck = prevBlock(); 
+
+	//If ptr is first block, then prevBlck will be equal to it. 
+	if (prevBlck != ptr && isFree(prevBlck))
+		coalesce(prevBlck, ptr)
+}
+
+void FF_Heap::coalesce(void *left, void *right){
+	hdrP lHdr = getHeader(left); 
+	ftrP rFtr = getFooter(right); 
+
+	//Calculates new data blocks size
+	uint32_t dataSize = lHdr->size + sizeof(ftr_t) + sizeof(hdr_t) + rFtr->size; 
+
+	//Updates size on header and footer of new block. 
+	lHdr->size = dataSize;
+	rFtr->size = dataSize; 
+
+	//Performs sanity check just in case. 
+	sanity(left, "coalesce"); 
 }

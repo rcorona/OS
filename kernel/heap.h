@@ -24,6 +24,10 @@
 //Minimum size of data part of block in bytes. 
 #define MIN_BLCK_DATA 4
 
+//Error codes
+#define HDR_FTR_MISMATCH 1
+#define BLCK_SZ_MISMATCH 2
+
 //General malloc and free functions. Will call
 //pertaining function using current heap.
 //TODO possibly move this to cstdlib. 
@@ -52,8 +56,10 @@ public:
 
 	/* Performs a "sanity" check on a block to make sure
 	   that it's header and footer match and that the size
-	   of the block is correct */
-	virtual void sanity(void *block) = 0;
+	   of the block is correct 
+
+	   optional calling function name may be inputted*/
+	virtual uint32_t sanity(void *block, const char *function = "") = 0;
 
 private:
 	void *base; 
@@ -87,9 +93,9 @@ public:
 
 	void *malloc(size_t size); 
 	void free(void *ptr); 
-	void sanity(void *block);
 
-	// TODO sanity. 
+	//Sets error code if error is found. 
+	uint32_t sanity(void *block, const char *function = ""); 
 
 private:
 	struct header{
@@ -107,7 +113,7 @@ private:
 	typedef struct footer ftr_t; 
 
 	typedef hdr_t* hdrP; 
-	typedef ftr_t* ftrP; 
+	typedef ftr_t* ftrP;  
 
 	//Pointer to the first block. 
 	void *firstBlock; 
@@ -131,8 +137,14 @@ private:
 	//Returns next block. Will wrap and return firstBlock. 
 	void *nextBlock(void *block); 
 
+	//Returns previous block. Will return firstBlock if no previous blocks found. 
+	void *prevBlock(void *block); 
+
 	//Splits block into two blocks if possible. 
 	void splitBlock(void *block, size_t size); 
+
+	//Coalesces block on left with one on right. 
+	void coalesce(void *left, void *right); 
 };
 
 #endif

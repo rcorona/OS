@@ -13,6 +13,8 @@ Heap_Base *Heap::heap = 0;
 
 //Overrides new operator. 
 void *operator new(size_t size, void *ptr){
+	(void)size; //For unused variable warning. 
+
 	return ptr; 
 }
 
@@ -59,9 +61,9 @@ FF_Heap::FF_Heap(void *baseAddr, size_t size) : Heap_Base(baseAddr, size){
 
 	hdrP hdr = (hdrP)getHeader(firstBlock);
 
-	printf("Created first block with address: %x, size: %d\n", (uint32_t)firstBlock, hdr->size); 
+	printf("Created first block with address: %lx, size: %lu\n", (uint32_t)firstBlock, hdr->size); 
 
-	printf("sizeof heap: %x sizeof hdr: %x, sizeof footer: %x\n", sizeof(FF_Heap), sizeof(hdr_t), sizeof(ftr_t)); 
+	printf("sizeof heap: %zu sizeof hdr: %zu, sizeof footer: %zu\n", sizeof(FF_Heap), sizeof(hdr_t), sizeof(ftr_t)); 
 }
 
 void *FF_Heap::makeBlock(uint8_t *startAddr, size_t size){
@@ -213,17 +215,17 @@ void FF_Heap::free(void *ptr){
 	hdr->free = ftr->free = true; 
 
 	//check right block to do right coalesce if necessary
-	nextBlck = nextBlock();
+	void *nextBlck = nextBlock(ptr);
 
 	if (nextBlck != firstBlock && isFree(nextBlck))
 		coalesce(ptr, nextBlck); 
 
 	//check left block to do left coalesce if necessary
-	prevBlck = prevBlock(); 
+	void *prevBlck = prevBlock(ptr); 
 
 	//If ptr is first block, then prevBlck will be equal to it. 
 	if (prevBlck != ptr && isFree(prevBlck))
-		coalesce(prevBlck, ptr)
+		coalesce(prevBlck, ptr);
 }
 
 void FF_Heap::coalesce(void *left, void *right){

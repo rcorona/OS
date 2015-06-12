@@ -12,9 +12,6 @@
 #include "stdio.h"
 #include "gdt.h"
 #include "idt.h"
-#include "pit.h"
-#include "keyboard.h"
-#include "heap.h" 
 
 /*Checks for cross compiler targeting issues */
 #if defined(__linux__)
@@ -26,12 +23,8 @@
 #error "Not using an ix86-elf compiler"
 #endif
 
-//Definition of __cxa_pure_virtual, necessary for pure virtual
-//functions. 
-extern "C" void __cxa_pure_virtual() { while (1); }
-
-//Magic break point for BOCHS. 
-#define MAGIC_BREAK asm volatile ("xchg %bx, %bx");
+//For Virtual functions. TODO move somewhere more standard. 
+extern "C" void __cxa_pure_virtual() { while(true); }
 
 #if defined(__cplusplus)
 extern "C" //use C linkage for kernel main
@@ -46,9 +39,20 @@ void kernel_main(){
 	//Initializes VGA
 	VGA::init(); 
 
-	//Initializes PIT. 
-	initPIT(PIT_FREQ);
+	putchar('H'); 
 
-	//Initializes heap. 
-	Heap::init(HEAP_START, HEAP_SIZE); 
+	puts("elloo, kernel World!\n"); 
+	puts("How are you?\n");
+
+	printf("HELLO AGAIN\n");
+
+	int testNum = 0xFFFFFFFF;
+
+	printf("Num before: %x\n", testNum); 
+
+	memset(&testNum, 0xAA, sizeof(int));
+
+	printf("Num after: %x\n", testNum);
+
+	//putchar((char)(1/0)); //Not working: 0, 8, 10,  
 }

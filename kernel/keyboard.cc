@@ -43,4 +43,6 @@ void keyboardHandler(struct regs *r){
 		else
 			printf("Key %d pressed.\n", scancode); 
 	}
+
+	(void)r; //TODO remove once r is actually used. 
 }

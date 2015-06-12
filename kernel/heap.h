@@ -13,7 +13,7 @@
 #include "stdio.h"
 
 //Beginning of main heap (if there are multiple). 
-#define HEAP_START (void *)0x100000
+#define HEAP_START 0x100000
 
 //Size of main heap (if there are multiple). 
 #define HEAP_SIZE 0x300000

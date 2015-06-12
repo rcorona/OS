@@ -98,7 +98,7 @@ void idtInit(){
 }
 
 void fault_handler(struct regs *r){
-	printf("Received Interrupt: #%x\n", r->isrNum);
+	printf("Received Interrupt: #%lu\n", r->isrNum);
 	while (true); 
 }
 

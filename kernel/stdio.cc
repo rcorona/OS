@@ -25,6 +25,8 @@ void printf(const char *str, ...){
 
 	va_start(args, str); 
 
+	//TODO add more cases/functionality until full printf specs are met. 
+
 	while (str[index]){
 		if (str[index] == '%'){
 			switch (str[++index]){
@@ -37,7 +39,7 @@ void printf(const char *str, ...){
 					break;
 
 				case 'x':
-					puthex(va_arg(args, int)); 
+					puthex(va_arg(args, unsigned int)); 
 					break;
 
 				case 'c':
@@ -46,6 +48,44 @@ void printf(const char *str, ...){
 
 				case 's':
 					puts(va_arg(args, const char *)); 
+					break;
+
+				case 'l':
+					switch (str[++index]){
+						case 'u':
+							putdec(va_arg(args, long unsigned int));
+							break;
+
+						case 'd':
+							putdec(va_arg(args, long int)); 
+							break;
+
+						case 'i':
+							putdec(va_arg(args, long int)); 
+							break;
+
+						case 'x':
+							puthex(va_arg(args, long unsigned int)); 
+							break;
+					}
+
+					break;
+
+				case 'z':
+					switch (str[++index]){
+						case 'd':
+							putdec(va_arg(args, size_t));
+							break;
+
+						case 'i':
+							putdec(va_arg(args, size_t));
+							break;
+
+						case 'u':
+							putdec(va_arg(args, size_t));
+							break;
+					}
+
 					break;
 
 				default:

@@ -60,6 +60,9 @@ public:
 
 	   optional calling function name may be inputted*/
 	virtual uint32_t sanity(void *block, const char *function = "") = 0;
+	
+	//Visually prints the heap. 
+	virtual void printHeap() = 0;
 
 private:
 	void *base; 
@@ -75,6 +78,8 @@ public:
 	static void *malloc(size_t size); 
 
 	static void free(void *ptr); 
+	
+	static void printHeap(); 
 
 private:
 	//Singleton class. 
@@ -94,8 +99,9 @@ public:
 	void *malloc(size_t size); 
 	void free(void *ptr); 
 
-	//Sets error code if error is found. 
 	uint32_t sanity(void *block, const char *function = ""); 
+	
+	void printHeap(); 
 
 private:
 	struct header{

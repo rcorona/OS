@@ -242,3 +242,23 @@ void FF_Heap::coalesce(void *left, void *right){
 	//Performs sanity check just in case. 
 	sanity(left, "coalesce"); 
 }
+
+void FF_Heap::printHeap(){
+	void *current = firstBlock; 
+	hdrP hdr = getHeader(current);
+	ftrP ftr = getFooter(current);
+	
+	printf("FF_Heap:\n");
+	printf("Object: %lx Size: %zd\n", (uint32_t)this, sizeof(FF_Heap));
+		
+	do{
+		printf("HDR: %lx\n", (uint32_t)hdrP);
+		printf("BLOCK: %lx SIZE: %lu\n", (uint32_t)current, hdrP->size);
+		printf("FTR: %lx\n\n", (uint32_t)ftrP);
+		
+		current = nextBlock(current);
+		hdrP = getHeader(current);
+		ftrP = getFooter(current);
+	} 
+	while(current != firstBlock);
+}

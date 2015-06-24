@@ -5,19 +5,18 @@ Rodolfo Corona Rodriguez
 Implementation for kernel testing functions. 
 */
 
-#include tests.h
+#include "tests.h"
 
-tests::testHeap(){
+void Tests::testHeap(){
 	printf("Testing the heap...\n\n");
 	
 	//Tests malloc by itself.
 	printf("Test1: Malloc by itself...\n");
 	
-	int *numP1 = malloc(sizeof(int));
+	int *numP1 = (int *)malloc(sizeof(int));
 	int *numP2 = new int; 
-	char *charP = "FAIL";
 	
-	charP = new char[4];
+	char *charP = new char[4];
 	charP[0] = 'P';
 	charP[1] = 'A';
 	charP[2] = 'S';
@@ -35,15 +34,17 @@ tests::testHeap(){
 	delete numP2;
 	delete [] charP; 
 	
-	if (!(numP1 == malloc(sizeof)))
+	if (!(numP1 == malloc(sizeof(int))))
 		printf("First assignment on newly freed heap not same as last time, is that expected?\n\n");
 	
 	
 	//Tests coalescing
 	printf("Test3: Coalescing...\n");
 	
-	int* numP1 = new int; 
-	int* numP2 = new int;
+	delete numP1;
+
+	numP1 = new int; 
+	numP2 = new int;
 	int* numP3 = new int;
 	
 	printf("Current heap:\n");

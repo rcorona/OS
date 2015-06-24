@@ -27,8 +27,5 @@ void initPIT(uint32_t hz){
 }
 
 void PITHandler(struct regs *r){
-	if (false)//! (ticks++ % 100))
-		printf("%lu seconds have passed...\n", seconds++); 
-
-	(void)r; //TODO Remove once r is actually used. 
+	(void)r; //For unused parameter warning. Remove when possible.
 }

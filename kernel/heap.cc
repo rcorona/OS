@@ -8,14 +8,38 @@
 
 Heap_Base *Heap::heap = 0; 
 
-/* PLACEMENT NEW */
+
+/* NEW AND DELETE OVERLOADING */
 
 
-//Overrides new operator. 
+//Placement new. 
 void *operator new(size_t size, void *ptr){
 	(void)size; //For unused variable warning. 
 
 	return ptr; 
+}
+
+
+//TODO Placement delete? 
+
+//New
+void *operator new(size_t size){
+	return malloc(size); 
+}
+
+//New[]
+void *operator new[](size_t size){
+	return malloc(size); 
+}
+
+//Delete
+void operator delete(void *ptr){
+	free(ptr); 
+}
+
+//Delete[]
+void operator delete[](void *ptr){
+	free(ptr); 
 }
 
 
@@ -47,6 +71,10 @@ void Heap::free(void *ptr){
 	heap->free(ptr); 
 }
 
+void Heap::printHeap(){
+	heap->printHeap(); 
+}
+
 
 /* First Fit Heap implementation */
 
@@ -58,12 +86,6 @@ FF_Heap::FF_Heap(void *baseAddr, size_t size) : Heap_Base(baseAddr, size){
 	size_t firstBlckSize = size - sizeof(FF_Heap);
 
 	firstBlock = makeBlock((uint8_t *)firstBlckAddr, firstBlckSize);
-
-	hdrP hdr = (hdrP)getHeader(firstBlock);
-
-	printf("Created first block with address: %lx, size: %lu\n", (uint32_t)firstBlock, hdr->size); 
-
-	printf("sizeof heap: %zu sizeof hdr: %zu, sizeof footer: %zu\n", sizeof(FF_Heap), sizeof(hdr_t), sizeof(ftr_t)); 
 }
 
 void *FF_Heap::makeBlock(uint8_t *startAddr, size_t size){
@@ -123,7 +145,7 @@ bool FF_Heap::isFree(void *block){
 bool FF_Heap::isFreeFit(void *block, size_t size){
 	hdrP hdr = getHeader(block);
 
-	return (hdr->free && hdr->size <= size); 
+	return (hdr->free && size <= hdr->size); 
 }
 
 void *FF_Heap::nextBlock(void *block){
@@ -197,6 +219,12 @@ void *FF_Heap::malloc(size_t size){
 	//Splits block if possible. 
 	splitBlock(block, actualSize); 
 
+	hdrP hdr = getHeader(block);
+	ftrP ftr = getFooter(block);
+
+	//Allocates the block. 
+	hdr->free = ftr->free = false; 
+
 	return block; 
 }
 
@@ -205,7 +233,7 @@ void FF_Heap::free(void *ptr){
 	sanity(ptr, "free"); 
 
 	//Checks if block is already free, raises error if so. 
-	if (!isFree(ptr))
+	if (isFree(ptr))
 		PANIC("Attempting to free already free block!!!");
 
 	//sets block as free. 
@@ -252,13 +280,13 @@ void FF_Heap::printHeap(){
 	printf("Object: %lx Size: %zd\n", (uint32_t)this, sizeof(FF_Heap));
 		
 	do{
-		printf("HDR: %lx\n", (uint32_t)hdrP);
-		printf("BLOCK: %lx SIZE: %lu\n", (uint32_t)current, hdrP->size);
-		printf("FTR: %lx\n\n", (uint32_t)ftrP);
+		printf("HDR: %lx\n", (uint32_t)hdr);
+		printf("BLOCK: %lx SIZE: %lu\n", (uint32_t)current, hdr->size);
+		printf("FTR: %lx\n\n", (uint32_t)ftr);
 		
 		current = nextBlock(current);
-		hdrP = getHeader(current);
-		ftrP = getFooter(current);
+		hdr = getHeader(current);
+		ftr = getFooter(current);
 	} 
 	while(current != firstBlock);
 }

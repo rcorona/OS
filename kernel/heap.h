@@ -125,7 +125,7 @@ private:
 	void *firstBlock; 
 
 	/*Creates a free block with the given size and start addres,
-	  then returns a pointer to it. */
+	  then returns a pointer to it. NOTE: size should include hdr & ftr*/
 	void *makeBlock(uint8_t *startAddr, size_t size); 
 	
 	//Returns a footer pointer given a block's starting address (start for data that is). 

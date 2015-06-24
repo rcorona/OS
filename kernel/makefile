@@ -3,7 +3,7 @@ ASM= nasm -f elf
 CC= $(TARGET)-g++
 CFLAGS= -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -std=c++11
 OS= os.bin
-SOURCES= boot.o kernel.o vga.o stdio.o gdt.o idt.o machine.o pit.o keyboard.o heap.o
+SOURCES= boot.o kernel.o vga.o stdio.o gdt.o idt.o machine.o heap.o tests.o vmm.o pit.o keyboard.o
 
 all: kernel
 
@@ -34,15 +34,23 @@ idt.o:
 pit.o:
 	$(CC) -c pit.cc -o pit.o $(CFLAGS)
 
-keyboard.o:
-	$(CC) -c keyboard.cc -o keyboard.o $(CFLAGS)
-
 heap.o:
 	$(CC) -c heap.cc -o heap.o $(CFLAGS)
+
+tests.o:
+	$(CC) -c tests.cc -o tests.o $(CFLAGS)
+
+vmm.o:
+	$(CC) -c vmm.cc -o vmm.o $(CFLAGS)
+
+keyboard.o:
+	$(CC) -c keyboard.cc -o keyboard.o $(CFLAGS)
 
 clean:
 	rm -rf *o
 
-dump:
-	objdump -D kernel > odump.txt
-	vim odump.txt
+run:
+	qemu-system-i386 -kernel $(OS)
+
+debug:
+	qemu-system-i386 -s -S hdc.img

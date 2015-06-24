@@ -12,7 +12,7 @@ uint8_t *PhysMem::frames = 0;
 uint32_t PhysMem::nFrames = 0;
 
 void PhysMem::init(uint32_t start, uint32_t end){
-	if (start < 0 || end < start)
+	if (end <= start)
 		PANIC("Given range doesn't make sense!");
 	
 	if (start % ALIGNMENT)
@@ -47,6 +47,9 @@ uint32_t PhysMem::alloc(){
 	
 	while (*(frames + frameNum))
 		frameNum++; 
+
+	//Sets block as allocated. 
+	*(frames + frameNum) = 1; 
 	
 	return (uint32_t)frames + (frameNum * ALIGNMENT);
 }
@@ -58,7 +61,7 @@ void PhysMem::free(uint32_t frame){
 	if (frame % ALIGNMENT)
 		PANIC("Trying to free a frame at an address that's not aligned!");
 	
-	frameNum = (frame - (uint32_t)frames) / ALIGNMENT; 
+	uint32_t frameNum = (frame - (uint32_t)frames) / ALIGNMENT; 
 	
 	*(frames + frameNum) = 0; 
 }

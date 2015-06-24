@@ -8,6 +8,8 @@ Contains declarations for virtual memory functions and objects
 #ifndef _VMM_H
 #define _VMM_H
 
+#include "stdio.h"
+
 class PhysMem{
 public:
 	//Bitmap for all the frames. 

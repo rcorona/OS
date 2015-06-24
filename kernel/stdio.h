@@ -15,7 +15,7 @@
 #include <stdarg.h>
 
 //For debugging. Will halt the system with message. 
-#define PANIC(...) {printf("PANIC: "); printf(__VA_ARGS__); while (true);}
+#define PANIC(...) {printf("PANIC: "); printf(__VA_ARGS__); printf("\nFile: %s, Line: %d", __FILE__, __LINE__); while (true);}
 
 void putchar(char c);
 void puts(const char *str); 

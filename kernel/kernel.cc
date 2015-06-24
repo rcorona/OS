@@ -7,11 +7,17 @@
 #if !defined(__cplusplus)
 #include <stdbool.h>
 #endif
+
 #include <stddef.h>
 #include <stdint.h>
 #include "stdio.h"
 #include "gdt.h"
 #include "idt.h"
+#include "heap.h"
+#include "tests.h"
+#include "vmm.h"
+#include "pit.h"
+#include "keyboard.h"
 
 /*Checks for cross compiler targeting issues */
 #if defined(__linux__)
@@ -39,20 +45,12 @@ void kernel_main(){
 	//Initializes VGA
 	VGA::init(); 
 
-	putchar('H'); 
+	//Initializes PIT
+	initPIT(PIT_FREQ); 
 
-	puts("elloo, kernel World!\n"); 
-	puts("How are you?\n");
+	//Initializes heap. 
+	Heap::init((void *)HEAP_START, HEAP_SIZE);
 
-	printf("HELLO AGAIN\n");
-
-	int testNum = 0xFFFFFFFF;
-
-	printf("Num before: %x\n", testNum); 
-
-	memset(&testNum, 0xAA, sizeof(int));
-
-	printf("Num after: %x\n", testNum);
-
-	//putchar((char)(1/0)); //Not working: 0, 8, 10,  
+	//Initializes physical memory frames. 
+	PhysMem::init((uint32_t)HEAP_END, 0xFFFFFFFF);
 }
